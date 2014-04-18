@@ -8,10 +8,12 @@
 
 'use strict';
 
-var childProcess = require('child_process');
-var flexSdk = require('flex-sdk');
-var mxmlcOptions = require('./lib/options');
-var async = require('async');
+var childProcess = require('child_process'),
+  flexSdk = require('flex-sdk'),
+  async = require('async'),
+  _ = require('lodash'),
+  utils = require('./lib/utils');
+
 
 module.exports = function(grunt) {
 
@@ -21,17 +23,14 @@ module.exports = function(grunt) {
   grunt.registerMultiTask('compc', 'A Grunt task plugin to compile Adobe SWCs with the `compc` compiler from the Apache/Adobe Flex SDK.', function() {
       // Merge task-specific and/or target-specific options with these defaults.
       //var defaults = mxmlcOptions.getDefaults();
-      var options = this.options();
+      var taskOpts = this.options();
+      var globalTaskOpts = grunt.config.get('compc.options');
+
       var done = this.async();
 
       var workerFn = function(f, callback) {
 
-        var cmdLineOpts = options.rawConfig;
-        /*if (f.dest) {
-          cmdLineOpts.concat(' -output ' + f.dest);
-        }*/
-        //cmdLineOpts.push('--');
-        //cmdLineOpts.push.apply(cmdLineOpts, srcList);
+        var cmdLineOpts = utils.getCmdLineOpts(taskOpts, globalTaskOpts);
 
         grunt.verbose.writeln('compc path: ' + flexSdk.bin.compc);
         grunt.verbose.writeln('options: ' + cmdLineOpts);

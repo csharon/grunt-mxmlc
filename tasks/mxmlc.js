@@ -8,9 +8,10 @@
 
 'use strict';
 
-var childProcess = require('child_process');
-var flexSdk = require('flex-sdk');
-var async = require('async');
+var childProcess = require('child_process'),
+  flexSdk = require('flex-sdk'),
+  utils = require('./lib/utils'),
+  async = require('async');
 
 module.exports = function(grunt) {
 
@@ -19,8 +20,9 @@ module.exports = function(grunt) {
 
   grunt.registerMultiTask('mxmlc', 'A Grunt task plugin to compile Adobe Flex/ActionScript/MXML/FLV/etc. apps with the `mxmlc` compiler from the Apache/Adobe Flex SDK.', function() {
     // Merge task-specific and/or target-specific options with these defaults.
-    
-    var options = this.options();
+
+    var taskOpts = this.options();
+    var globalTaskOpts = grunt.config.get('mxmlc.options');
     var done = this.async();
 
     var workerFn = function(f, callback) {
@@ -36,11 +38,9 @@ module.exports = function(grunt) {
         }
       });
 
-      // Handle options.
-      // TODO: Start using the real defaults soon-ish
-      //var cmdLineOpts = mxmlcOptions.toCommandLineFormat(options);
-      // TEMPORARY HACK!
-      var cmdLineOpts = options.rawConfig ? options.rawConfig : [];
+
+      var cmdLineOpts = utils.getCmdLineOpts(taskOpts, globalTaskOpts);
+      
 
       if (f.dest) {
         cmdLineOpts.push('-output=' + f.dest );
